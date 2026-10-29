@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SweetBakery - Tiệm bánh ngọt</title>
+<style>
+:root{--pink:#b84f70;--rose:#f8e8ed;--cream:#fffaf5;--brown:#49352e;--muted:#786b65;--white:#fff}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--cream);color:var(--brown)}
+header{position:sticky;top:0;z-index:5;background:#fffdfb;border-bottom:1px solid #f0dce2;display:flex;align-items:center;justify-content:space-between;padding:14px 6%;gap:18px;flex-wrap:wrap}
+.brand{font-family:Georgia,serif;font-size:27px;font-weight:bold;color:var(--pink)}nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap}button{cursor:pointer;border:0;border-radius:22px;padding:10px 16px;background:var(--pink);color:#fff;font-weight:bold}button.secondary{background:var(--rose);color:var(--pink)}button:disabled{opacity:.5;cursor:not-allowed}
+.hero{padding:55px 6%;display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;background:linear-gradient(120deg,#fff4f0,#f9e6ed)}.hero h1{font-family:Georgia,serif;font-size:clamp(35px,5vw,60px);margin:0 0 14px}.hero p{font-size:18px;line-height:1.6;color:var(--muted)}.hero img{width:100%;height:330px;object-fit:cover;border-radius:24px}
+section{padding:38px 6%}.section-head{display:flex;justify-content:space-between;align-items:end;gap:15px;flex-wrap:wrap}h2{font-family:Georgia,serif;font-size:32px;margin:0 0 8px}.sub{color:var(--muted);margin:0 0 20px}.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px}.card{background:white;border-radius:18px;overflow:hidden;box-shadow:0 5px 22px #53302b10;border:1px solid #f1e2e4}.card img{width:100%;height:210px;object-fit:cover;display:block}.card-body{padding:16px}.card h3{margin:0 0 8px}.card p{color:var(--muted);line-height:1.45;min-height:42px}.price{font-size:19px;color:var(--pink);font-weight:bold;margin:12px 0}.locked{background:#fff5f7;color:#9a536a;border-radius:10px;padding:10px;font-size:14px;margin:12px 0}.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+footer{text-align:center;padding:28px;background:#49352e;color:#fff1f2}
+.modal{position:fixed;inset:0;background:#24171399;display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.modal.show{display:flex}.dialog{width:min(430px,100%);background:white;border-radius:20px;padding:24px;max-height:90vh;overflow:auto}.dialog h2{font-size:27px}.dialog label{display:block;font-size:14px;margin:12px 0 5px}.dialog input{width:100%;padding:12px;border:1px solid #dfccd0;border-radius:10px;font-size:15px}.dialog .close{float:right;background:transparent;color:#555;font-size:22px;padding:0 6px}.msg{margin-top:12px;color:var(--pink);line-height:1.45}.hide{display:none!important}.notice{padding:12px 15px;background:#fff1e7;border-radius:12px;margin:15px 0;color:#754a32}
+@media(max-width:700px){.hero{grid-template-columns:1fr;padding-top:35px}.hero img{height:240px}header{padding:12px 4%}section{padding:30px 4%}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">SweetBakery 🍰</div>
+  <nav>
+    <button class="secondary" onclick="goProducts()">Sản phẩm</button>
+    <button class="secondary" onclick="showCart()">Giỏ hàng <span id="cartCount">0</span></button>
+    <button id="loginNav" onclick="openModal('login')">Đăng nhập</button>
+    <button id="registerNav" class="secondary" onclick="openModal('register')">Đăng ký</button>
+    <span id="userLabel" class="hide"></span>
+    <button id="logoutNav" class="secondary hide" onclick="logout()">Đăng xuất</button>
+  </nav>
+</header>
+<main>
+  <div class="hero">
+    <div><p>NGỌT NGÀO TỪ NHỮNG ĐIỀU NHỎ NHẤT</p><h1>Một chiếc bánh,<br>ngàn lời yêu thương.</h1><p>SweetBakery mang đến những chiếc bánh kem xinh xắn, làm mới mỗi ngày cho sinh nhật, lễ kỷ niệm và những khoảnh khắc đáng nhớ.</p><button onclick="goProducts()">Khám phá bánh kem</button></div>
+    <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=1000&q=85" alt="Bánh kem trang trí dâu tây">
+  </div>
+  <section id="productsSection">
+    <div class="section-head"><div><h2>Bánh được yêu thích</h2><p class="sub" id="productHint">Hãy đăng nhập để xem giá và đặt bánh nhé 💗</p></div></div>
+    <div id="products" class="products"></div>
+  </section>
+  <section id="accountArea" class="hide"><h2>Tài khoản của bạn</h2><p id="accountInfo"></p><h3>Lịch sử đơn hàng</h3><div id="history"></div></section>
+</main>
+<footer>SweetBakery · Bánh ngon cho ngày thêm ngọt ngào · © 2026</footer>
+
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()"><div class="dialog">
+<button class="close" onclick="closeModal()" aria-label="Đóng">×</button>
+<div id="loginForm"><h2>Chào mừng trở lại!</h2><p class="sub">Đăng nhập SweetBakery</p><label>Email</label><input id="loginEmail" type="email" placeholder="ban@email.com"><label>Mật khẩu</label><input id="loginPassword" type="password" placeholder="Nhập mật khẩu"><button style="width:100%;margin-top:16px" onclick="login()">Đăng nhập</button><p>Chưa có tài khoản? <a href="#" onclick="openModal('register');return false">Đăng ký</a></p><p><a href="#" onclick="openForgot();return false">Quên mật khẩu?</a></p><div id="loginMsg" class="msg"></div></div>
+<div id="registerForm" class="hide"><h2>Tạo tài khoản</h2><p class="sub">Đăng ký để xem giá và đặt bánh</p><label>Họ và tên</label><input id="regName" placeholder="Nguyễn Văn A"><label>Email</label><input id="regEmail" type="email" placeholder="ban@email.com"><label>Mật khẩu (ít nhất 6 ký tự)</label><input id="regPassword" type="password" placeholder="Tạo mật khẩu"><label>Nhập lại mật khẩu</label><input id="regConfirm" type="password" placeholder="Nhập lại mật khẩu"><button style="width:100%;margin-top:16px" onclick="register()">Đăng ký</button><p>Đã có tài khoản? <a href="#" onclick="openModal('login');return false">Đăng nhập</a></p><div id="registerMsg" class="msg"></div></div>
+<div id="forgotForm" class="hide"><h2>Quên mật khẩu</h2><p class="sub">Bản demo: nhập email và tạo mật khẩu mới.</p><label>Email tài khoản</label><input id="forgotEmail" type="email"><label>Mật khẩu mới</label><input id="forgotPassword" type="password"><button style="width:100%;margin-top:16px" onclick="resetPassword()">Đặt lại mật khẩu</button><p><a href="#" onclick="openModal('login');return false">Quay lại đăng nhập</a></p><div id="forgotMsg" class="msg"></div></div>
+</div></div>
+<script>
+const cakes=[
+{id:1,name:"Bánh kem dâu tây",desc:"Kem tươi mềm mịn, dâu tây tươi và cốt bánh bông lan.",price:320000,img:"https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=80"},
+{id:2,name:"Bánh chocolate",desc:"Chocolate đậm vị, lớp kem mượt mà dành cho tín đồ cacao.",price:350000,img:"https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80"},
+{id:3,name:"Bánh kem hoa hồng",desc:"Thiết kế thanh lịch, phù hợp sinh nhật và kỷ niệm.",price:420000,img:"https://images.unsplash.com/photo-1562777717-dc6984f65a63?auto=format&fit=crop&w=800&q=80"},
+{id:4,name:"Bánh vanilla trái cây",desc:"Cốt vanilla thơm nhẹ kết hợp trái cây tươi theo mùa.",price:300000,img:"https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=800&q=80"},
+{id:5,name:"Bánh mini pastel",desc:"Bánh nhỏ xinh với màu pastel dịu dàng, ngọt vừa phải.",price:180000,img:"https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=800&q=80"},
+{id:6,name:"Bánh sinh nhật đặc biệt",desc:"Trang trí theo phong cách đáng yêu cho ngày đặc biệt.",price:480000,img:"https://images.unsplash.com/photo-1558301211-0d8c8ddee6ec?auto=format&fit=crop&w=800&q=80"}];
+let currentUser=localStorage.getItem('sb_current')||'', cart=JSON.parse(localStorage.getItem('sb_cart_'+currentUser)||'[]');
+const money=n=>n.toLocaleString('vi-VN')+' ₫';
+function render(){const logged=!!currentUser;document.getElementById('productHint').textContent=logged?'Chọn chiếc bánh yêu thích của bạn 💗':'Hãy đăng nhập để xem giá và đặt bánh nhé 💗';
+document.getElementById('products').innerHTML=cakes.map(c=>`<article class="card"><img src="${c.img}" alt="${c.name}" loading="lazy"><div class="card-body"><h3>${c.name}</h3>${logged?`<p>${c.desc}</p><div class="price">${money(c.price)}</div><button onclick="addCart(${c.id})">Thêm vào giỏ</button>`:`<div class="locked">🔒 Đăng nhập để xem giá bánh</div><button class="secondary" onclick="openModal('login')">Đăng nhập</button>`}</div></article>`).join('');
+document.getElementById('loginNav').classList.toggle('hide',logged);document.getElementById('registerNav').classList.toggle('hide',logged);document.getElementById('logoutNav').classList.toggle('hide',!logged);document.getElementById('userLabel').classList.toggle('hide',!logged);document.getElementById('userLabel').textContent=logged?'Xin chào, '+(getUser(currentUser)?.name||currentUser):'';document.getElementById('cartCount').textContent=cart.reduce((a,b)=>a+b.qty,0);document.getElementById('accountArea').classList.toggle('hide',!logged);if(logged)renderHistory();}
+function users(){return JSON.parse(localStorage.getItem('sb_users')||'{}')}function saveUsers(u){localStorage.setItem('sb_users',JSON.stringify(u))}function getUser(e){return users()[e]}
+function openModal(which){document.getElementById('modal').classList.add('show');['loginForm','registerForm','forgotForm'].forEach(id=>document.getElementById(id).classList.add('hide'));document.getElementById(which+'Form').classList.remove('hide');['loginMsg','registerMsg','forgotMsg'].forEach(id=>document.getElementById(id).textContent='');}
+function closeModal(){document.getElementById('modal').classList.remove('show')}function openForgot(){openModal('forgot')}
+function register(){const name=document.getElementById('regName').value.trim(),email=document.getElementById('regEmail').value.trim().toLowerCase(),pw=document.getElementById('regPassword').value,cf=document.getElementById('regConfirm').value,msg=document.getElementById('registerMsg');if(!name||!email||!pw){msg.textContent='Vui lòng điền đầy đủ thông tin.';return}if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){msg.textContent='Email chưa hợp lệ.';return}if(pw.length<6){msg.textContent='Mật khẩu cần ít nhất 6 ký tự.';return}if(pw!==cf){msg.textContent='Mật khẩu nhập lại chưa khớp.';return}const u=users();if(u[email]){msg.textContent='Email này đã đăng ký. Hãy đăng nhập.';return}u[email]={name,password:pw};saveUsers(u);document.getElementById('loginEmail').value=email;openModal('login');document.getElementById('loginMsg').textContent='Đăng ký thành công! Hãy đăng nhập bằng tài khoản vừa tạo.';}
+function login(){const email=document.getElementById('loginEmail').value.trim().toLowerCase(),pw=document.getElementById('loginPassword').value,msg=document.getElementById('loginMsg'),u=getUser(email);if(!u||u.password!==pw){msg.textContent='Email hoặc mật khẩu không đúng.';return}currentUser=email;localStorage.setItem('sb_current',email);cart=JSON.parse(localStorage.getItem('sb_cart_'+email)||'[]');closeModal();render();document.getElementById('productsSection').scrollIntoView({behavior:'smooth'});}
+function logout(){localStorage.setItem('sb_cart_'+currentUser,JSON.stringify(cart));currentUser='';localStorage.removeItem('sb_current');cart=[];render();window.scrollTo({top:0,behavior:'smooth'});}
+function addCart(id){if(!currentUser){openModal('login');return}const item=cart.find(x=>x.id===id);if(item)item.qty++;else cart.push({id,qty:1});localStorage.setItem('sb_cart_'+currentUser,JSON.stringify(cart));render();alert('Đã thêm bánh vào giỏ hàng!')}
+function showCart(){if(!currentUser){openModal('login');return}const lines=cart.map(x=>{const c=cakes.find(k=>k.id===x.id);return `${c.name} × ${x.qty}: ${money(c.price*x.qty)}`});const total=cart.reduce((s,x)=>s+cakes.find(c=>c.id===x.id).price*x.qty,0);alert((lines.length?lines.join('\n'):'Giỏ hàng đang trống.')+'\n\nTổng cộng: '+money(total)+(lines.length?'\n\nĐây là bản minh họa, chưa xử lý thanh toán thật.':''));}
+function renderHistory(){const orders=JSON.parse(localStorage.getItem('sb_orders_'+currentUser)||'[]');document.getElementById('accountInfo').textContent='Tài khoản: '+currentUser;document.getElementById('history').innerHTML=orders.length?orders.map(o=>`<p>${o.date} — ${money(o.total)}</p>`).join(''):'<p>Bạn chưa có đơn hàng nào. (Thanh toán trực tuyến chưa được tích hợp.)</p>'}
+function resetPassword(){const email=document.getElementById('forgotEmail').value.trim().toLowerCase(),pw=document.getElementById('forgotPassword').value,msg=document.getElementById('forgotMsg'),u=users();if(!u[email]){msg.textContent='Không tìm thấy tài khoản với email này.';return}if(pw.length<6){msg.textContent='Mật khẩu mới cần ít nhất 6 ký tự.';return}u[email].password=pw;saveUsers(u);openModal('login');document.getElementById('loginEmail').value=email;document.getElementById('loginMsg').textContent='Đã đổi mật khẩu trong bản demo. Hãy đăng nhập.'}
+function goProducts(){document.getElementById('productsSection').scrollIntoView({behavior:'smooth'})}
+render();
+</script>
+</body>
+</html>
